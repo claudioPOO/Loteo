@@ -1,0 +1,66 @@
+
+<style>
+
+  header{
+    color:rgb(76, 66, 226);
+    font-family: 'Times New Roman', Times, serif;
+  }
+  
+  #lote{
+    display: flex;
+    /* max-width: 90%; */
+    margin-bottom: 20px;
+    overflow-x:auto;
+    width: 95vw;
+    margin-top: 20px;
+    padding: 20px;
+    
+  }
+  div.lote{
+    margin: 20px;
+  }
+</style>
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Inmobiliaria</title>
+    <meta charset="utf-8" />
+<!--     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+ --><!--     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+ -->    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script async defer src="https://apis.google.com/js/api.js" id="gapiloaded" ></script>
+    <script async defer src="https://accounts.google.com/gsi/client" id="gisloaded" ></script>
+    <script async defer src="js/Oauth.js"></script>
+    <script async defer src="js/index.js"></script>
+    <script async defer src="js/lotes.js"></script>
+    
+</head>
+  <body class="bg alert-success" >
+    <header>
+      <h1>Bienvenidos! Inmobiliaria Quiroga</h1>
+    </header>
+
+    <!--Add buttons to initiate auth sequence and sign out-->
+    <button type="button" class="btn btn-success" id="authorize_button" onclick="handleAuthClick()">Iniciar Sesion</button>
+    <button type="button" class="btn btn-success" id="signout_button" onclick="handleSignoutClick()">Cerrar Sesion</button>
+    
+    
+    <div id="lote">
+
+    </div>
+    <button class="border rounded-full p-2 bg-blue-500 text-white shadow-lg hover:bg-blue-300 ">
+      HOLA SOY UN B
+    </button>
+    
+
+    
+
+    
+    
+    
+    
+  
+  </body>
+</html>
