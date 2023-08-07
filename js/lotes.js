@@ -29,8 +29,8 @@ async function getLotes(){
 
     lotes = convertToObjects(range.values);
 
-    console.log(lotes)
-    
+    //console.log(lotes)
+    mostrarLotes(lotes);
 }
 
 
@@ -50,4 +50,37 @@ function convertToObjects(arrayLotes){
 
     return result;
 
+}
+
+const contenedor=document.getElementById('contenedor-lote')
+function mostrarLotes(lotes){
+    lotes.forEach(lote=>{
+        const card_lote=document.createElement('div')
+        card_lote.setAttribute('class',"border rounded w-fit p-3 flex flex-col gap-y-2 bg-gray-200 shadow-lg hover:bg-gray-100 cursor-pointer")
+        console.log(lote)
+        card_lote.setAttribute('id','card_lote'+lote.id_lote)
+        card_lote.innerHTML=`
+            <div class=" ">
+                <h3 class="text-center">${lote.nombre}</h3>
+                <img  class=" rounded" width="250" height="250" src="https://img.freepik.com/foto-gratis/delimitacion-terreno-bosque_23-2149721838.jpg" alt="">
+            </div>
+            <div class="">
+                <p>${lote.departamento.toUpperCase()} - ${lote.direccion} </p>
+                <p class="text-md"> <span> Superficie: </span>${lote.superficie}</p>
+                <p class="text-md"><span>Cantidad de Terrenos:</span>${lote.cant_terrenos}</p>
+                <p class="text-md"><span>Disponibles:</span> ${lote.disponibles}</p>
+            </div>
+            `
+            card_lote.addEventListener('click',()=>{
+                console.log(lote.id_lote)
+                limpiar()
+            })
+            contenedor.appendChild(card_lote)
+
+        })
+    
+}
+function limpiar(){
+
+    contenedor.innerHTML=''
 }
