@@ -1,4 +1,14 @@
+#index{
+    background-image: url("../src/plano.jpg");
+    background-repeat: no-repeat;
+    background-size: cover
+} 
+
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400&family=Roboto:ital,wght@0,100;0,300;0,400;0,700;1,100&display=swap');
+
+/* #index{
+    background-image: linear-gradient(to right, #8d8989, #f1f1f185);
+} */
 
 *{
     margin: 0;
@@ -8,17 +18,17 @@
 }
 
 
-/*Algunas variables de transicion*/
-:root{
-
-    --tran-03: all 0.3s ease;
-    --tran-04: all 0.4s ease;
-    --tran-04: all 0.5s ease;
-}
-
-
-
-.sidebar{
-    transition: var(--tran-05);
-    z-index: 100;
-}
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-left-color: #333; /* Color del spinner */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  

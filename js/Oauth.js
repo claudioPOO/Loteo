@@ -26,8 +26,11 @@ document.getElementById("loadClient").addEventListener('load', gisLoaded)
 
 //Se ocultan los botones de inicar sesion y cerrar sesion
 document.getElementById('authorize_button').style.visibility = 'hidden';
-document.getElementById('signout_button').style.visibility = 'hidden';
+//document.getElementById('signout_button').style.visibility = 'hidden';
 
+
+//SPINNER
+var spinner = document.querySelector("#spinner")
 
 
 
@@ -88,13 +91,21 @@ function handleAuthClick() {
         }
         //Si no hubo ningun error, se hace visible el boton de cerrar sesion
         //Y cambiar el button para iniciar sesion a refresh
-        document.getElementById('signout_button').style.visibility = 'visible';
-        document.getElementById('authorize_button').innerText = 'Refresh';
+        //document.getElementById('signout_button').style.visibility = 'visible';
+        //document.getElementById('authorize_button').innerText = 'Refresh';
 
         //Redirige al usuario
         //window.location.href = '../html/lotes.html';
 
+        //Limpiamos el inicio
+        //clearIndex()
+
+        
+        spinner.classList.remove("hidden")  //Muestra spinner
         await getLotes()
+        spinner.classList.add("hidden")     //Oculta spinner
+
+
         //await listMajors();
         //await getUserProfile();
     };
@@ -113,13 +124,21 @@ function handleAuthClick() {
  *  Sign out the user upon button click.
  */
 function handleSignoutClick() {
-const token = gapi.client.getToken();
+    spinner.classList.remove("hidden")  //Muestra spinner
+
+    const token = gapi.client.getToken();
     if (token !== null) {
+        
+        //Borra el token
         google.accounts.oauth2.revoke(token.access_token);
         gapi.client.setToken('');
-        document.getElementById('content').innerText = '';
-        document.getElementById('authorize_button').innerText = 'Authorize';
-        document.getElementById('signout_button').style.visibility = 'hidden';
+
+        //Ocultamos dashboard
+        document.querySelector("#nabvar").classList.add("hidden")
+        document.querySelector("#dashoard").classList.add("hidden")
+
+        spinner.classList.add("hidden")  //Oculta spinner        
+        
     }
 }
 
@@ -127,56 +146,7 @@ const token = gapi.client.getToken();
  * Print the names and majors of students in a sample spreadsheet:
  * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
  */
-async function listMajors() {
 
-    //console.log(gapi.client)
-
-    let response;
-    try {
-        // Fetch first 10 files
-        response = await gapi.client.sheets.spreadsheets.values.get({
-        spreadsheetId: '1oWd2Nr4qCsJ9sSMrUcEIenZ_0pphDMREbVbVlUx6Ph8',
-        range: 'Lotes!A:H',
-        });
-    } catch (err) {
-        console.error(err)
-        //document.getElementById('content').innerText = err.message;
-        return;
-    }
-    //Evalua la longitud de la response
-    const range = response.result;
-    if (!range || !range.values || range.values.length == 0) {
-        //document.getElementById('content').innerText = 'No values found.';
-        console.warn("No se encontraron valores")
-        return;
-    }
-    // Muestra por pantalla
-    console.log(range.values)
-    console.log(convertToObjects(range.values))
-    /* const output = range.values.reduce(
-        (str, row) => `${str}${row[0]}, ${row[4]}\n`,
-        'Name, Major:\n');
-    document.getElementById('content').innerText = output;  */
-}
-
-
-function convertToObjects(arrayLotes){
-    //Desglozar encabezado y registros
-    const [encabezado, ...registros] = arrayLotes;
-
-    //Recorro el arreglo de datos
-    const result = registros.map( registro =>{
-        //Por cada registro creo un objeto
-        const obj = {};
-        encabezado.forEach((element,index )=> {
-            obj[element.toLowerCase()] = registro[index]
-        });
-        return obj;
-    })
-
-    return result;
-
-}
 
 async function getUserProfile() {
     try {
@@ -197,3 +167,5 @@ async function getUserProfile() {
         console.error('Error al obtener la información del perfil del usuario:', err);
     }
 }
+
+
