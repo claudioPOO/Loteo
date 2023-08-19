@@ -2,13 +2,17 @@
 const container=document.getElementById('body-dashboard')
 
 //ARREGLO DE LOTES
-var lotes = [];
+var loteos = [];
+
+//ARREGLO DE PORCENTAJES
+var porcentajes = []
 
 //ARREGLO DE SOCIOS
 var socios = []
 
-//ARREGLO DE PORCENTAJES
-var porcentajes = []
+//ARREGLO DE DEPARTAMENTOS
+var departamentos = []
+
 
 
 //ARREGLO DE TERRENOS
@@ -22,6 +26,11 @@ var estado =[]
 
 //ARREGLO DE TIPO DEL TERRENO
 var tipo=[]
+
+
+function limpiar(){
+    container.innerHTML=''
+}
 
 
 async function getLotes(){   
@@ -41,12 +50,11 @@ async function getLotes(){
     }
     
 
-
     let response;
     try {
         response = await gapi.client.sheets.spreadsheets.values.batchGet({
             spreadsheetId: '1oWd2Nr4qCsJ9sSMrUcEIenZ_0pphDMREbVbVlUx6Ph8',
-            ranges: ['Lotes!A:H', 'Lotes!J:L', 'Lotes!N:R']
+            ranges: ['Lotes!A:H', 'Lotes!J:L', 'Lotes!N:R', 'Lotes!U:V']
         });
 
 
@@ -66,13 +74,21 @@ async function getLotes(){
     // Muestra por pantalla
     //console.log(response.result.valueRanges)
 
-    lotes = convertToObjects(range[0].values)
+    loteos = convertToObjects(range[0].values)
     porcentajes = convertToObjects(range[1].values)
     socios = convertToObjects(range[2].values)
+    departamentos = convertToObjects(range[3].values)
 
-    //console.log(lotes, socios, porcentajes)
+    //console.log(loteos, socios, porcentajes, departamentos)
     
-    mostrarLotes(lotes, porcentajes, socios);
+    mostrarLotes(loteos, porcentajes, socios, departamentos);
+
+
+    //Cargamos el script dinamicamente
+    let script = document.createElement('script');
+    script.src = 'js/eventos_lotes.js';
+    document.body.appendChild(script);
+
 }
 
 
@@ -95,116 +111,175 @@ function convertToObjects(arrayLotes){
 }
 
 
-function mostrarLotes(lotes, porcentajes, socios){
+function mostrarLotes(loteos, porcentajes, socios, departamentos){
+
+    container.innerHTML=""
 
     //SECTION
     let section = document.createElement("section");
-    section.setAttribute("class", "mt-4");
+    section.setAttribute("class", "p-8");
     section.setAttribute("id", "section-loteo");
     
-    //TITLE
-    let title = document.createElement("p")
-    title.setAttribute("class", "uppercase text-red-600 font-semibold pl-8 mb-8")
-    title.innerText="Lotes"
+    //HEADER LOTEOS
+    let header = document.createElement("div");
+    header.setAttribute("class", "flex flex-col gap-y-4 mb-8 border-b-2 pb-2");
+    header.innerHTML = `
+        <div class="flex w-full items-center justify-between">
 
-    section.appendChild(title)
+            <!-- Title -->
+            <p class="uppercase text-red-600 font-semibold text-xl ">Loteos</p>
+
+            <div class="flex gap-x-2">
+                <!-- Button -->
+                <div class="flex items-center border rounded justify-center cursor-pointer bg-red-500 hover:bg-red-600 py-1 px-2 gap-x-2 text-white " id="add-loteo">
+                    <i class="flex items-center"><span class="material-icons-round"> add </span></i>
+                    <button class=""> Añadir Loteo </button>
+                </div>
+
+                <!-- Button -->
+                <div class="flex items-center border rounded justify-center cursor-pointer bg-green-600 hover:bg-green-700 py-1 px-2 gap-x-2 text-white" id="update-loteos">
+                    <i class="flex items-center"><span class="material-icons-round"> update </span></i>
+                    <button class=""> Actualizar </button>
+                </div>
+            </div>
+        </div> 
+
+        <!-- Filtros -->
+        <div class="flex items-center justify-between">
+            
+            <!-- ICON -->
+            <div class="flex items-center">
+                <i class="flex"><span class="material-icons-round"> filter_alt </span></i>
+                <p> Filtros </p>
+            </div>
+
+            <!-- Departamento -->
+            <div class="flex items-center w-1/4 gap-x-2">
+                <p class="tracking-wide">Departamentos:</p>
+                <select name="departamentos" id="departamentos" class="border border-2 rounded w-full p-1 cursor-pointer">
+                    <option value="0">Todos</option>
+                    ${ 
+                        departamentos.map( depto => {
+                         return createOptionsDptoHTML(depto)
+                        }).join('')
+                     
+                     }
+                </select>
+            </div>          
+
+            <!-- Nombre -->
+            <div class="flex items-center w-1/4 gap-x-2">
+                <p>Nombre: </p>
+                <input type="search" placeholder="Buscar por nombre" class="p-1 border border-2  w-full rounded focus:outline-none" id="search-loteo-nombre">
+            </div>
+
+            <!-- Socio -->
+                <div class="flex items-center w-1/4 gap-x-2">
+                <p>Socio: </p>
+                <input type="search" placeholder="Buscar por socio" class="p-1 border border-2 w-full rounded focus:outline-none" id="search-loteo-socio">
+            </div>
+
+        </div>
+    `
     
-    //BODY
+    //BODY CARD
     let div = document.createElement("div");
-    div.setAttribute("class", "flex flex-col gap-y-4 items-center");
+    div.setAttribute("class", "flex flex-wrap justify-between gap-y-8");
 
     //CARDS
-    lotes.forEach(lote=>{
+    loteos.forEach(loteo=>{
 
-        let card_lote = createCardLote(lote, porcentajes, socios)
+        let card_lote = createCardLote(loteo, porcentajes, socios, departamentos)
 
         div.appendChild(card_lote)
 
     })
 
+    section.appendChild(header)
     section.appendChild(div)
     container.appendChild(section)
     
 }
 
 
-
-function limpiar(){
-
-    contenedor.innerHTML=''
+function createOptionsDptoHTML(depto){
+    return `
+        <option value="${depto.id_depto}">${depto.nombre}</option>     
+    `
 }
 
 
-
-function createCardLote(lote, porcentajes, socios){
+function createCardLote(loteo, porcentajes, socios, departamentos){
  
     //Obtiene los socios de acuerdo al lote
-    const sociosFilters = porcentajes.filter(objeto => objeto.id_lote === lote.id_lote);
+    let sociosFilters = porcentajes.filter(objeto => objeto.id_lote === loteo.id_lote);
 
      
     //Inner join de socio con indo de Lote
-    const resultado = sociosFilters.map(socio => {
+    let resultado = sociosFilters.map(socio => {
         const nombreInfo = socios.find(nombre => nombre.id_socio === socio.id_socio);
         return { ...socio, ...nombreInfo };
     });
+
+
+    //Obtiene el departamento al que corresponde
+    let depto = departamentos.find(objeto => objeto.id_depto === loteo.id_depto)
         
 
-    //console.log(resultado)
+    /* console.log(sociosFilters)
+    console.log(resultado)
+    console.log(depto) */
         
     let card_lote = document.createElement('div')
-    card_lote.setAttribute('class',"flex flex-col gap-y-4 items-center")
+    card_lote.setAttribute('class',"border rounded-xl flex p-4 gap-x-4 shadow-lg cursor-pointer bg-slate-100 hover:bg-slate-200")
     //console.log(lote)
-    card_lote.setAttribute('id','lote'+lote.id_lote)
-    card_lote.innerHTML=`
-        <!-- Card para la  tarjeta -->
-        <div class="flex border  w-fit border rounded-xl shadow-lg bg-white cursor-pointer hover:bg-slate-100">        
+    card_lote.setAttribute('id','loteo'+loteo.id_lote)
 
-        <!-- Imagen -->
-        <div class="w-40 h-40">
-            <img class="h-full rounded-l-xl" src="https://img.freepik.com/foto-gratis/delimitacion-terreno-cielo-despejado_23-2149721839.jpg" alt="Modern building architecture">
-        </div>
-        
-        <!--Info-->
-        <div class="flex flex-col py-2 pl-2 pr-4 border-r max-w-md">
-            <div class="mb-4">
-            <p class="uppercase font-semibold text-red-600 text-md tracking-wide">${lote.nombre}</p>
-            <p class="text-sm"> <span class="uppercase tracking-wide text-black leading-tight font-semibold"> ${lote.departamento} </span> - ${lote.direccion} </p>
+    card_lote.innerHTML = `
+        <div class="flex flex-col">
+
+            <!--Info-->               
+            <h2 class="uppercase tracking-wide text-black leading-tight font-semibold text-lg">${depto.nombre}</h2>
+            <p class="tracking-wide">${loteo.direccion}</p>                                                     
+            
+            <!-- Nombre del Loteo -->
+            <div class="flex flex-grow items-center justify-center p-4">
+                <p class="uppercase font-semibold text-red-600 text-md tracking-wide text-xl">${loteo.nombre}</p>
             </div>
-            <div class="">
-            <p class="text-sm text-slate-500 tracking-wide leading-tight font-semibold"> Lorem ipsum dolor sit amet,udiandae ex quas in officiis, facilis sit recusandae eius? Exercitationem dolore est sapiente nemo dolorem ipsam!</p>
+
+            <!-- Lotes -->
+            <div class="flex">
+            <div class="flex items-center justify-between w-full gap-x-8">
+                <p class="text-slate-500 font-semibold text-lg">Lotes</p>               
+                <div class="flex gap-x-4">
+                    <p class="border rounded p-1"> <span class="text-sm font-semibold"> Total: </span> ${loteo.cant_terrenos} </p>
+                    <p class="border rounded p-1"> <span class="text-sm font-semibold"> Vendidos: </span> ${loteo.vendidos} </p>
+                    <p class="border rounded p-1"> <span class="text-sm font-semibold"> Disponibles: </span> ${loteo.disponibles} </p>
+                    </div>
+                </div>
             </div>
+
         </div>
-    
-        
-        <!-- Lotes -->
-        <div class="flex flex-col gap-y-2 py-2 px-4 border-r">
-            <p class="text-slate-500 font-semibold text-center">Lotes</p>
-            <div class="flex flex-col h-full justify-between">
-            <p class="border rounded p-1"> <span class="text-sm font-semibold"> Total: </span> ${lote.cant_terrenos} </p>
-            <p class="border rounded p-1"> <span class="text-sm font-semibold"> Vendidos: </span> ${lote.vendidos} </p>
-            <p class="border rounded p-1"> <span class="text-sm font-semibold"> Disponibles: </span> ${lote.disponibles} </p>
-            </div>
-        </div>
-        
+
+
+        <!-- Linea divisora -->
+        <hr class="h-auto border border-white border-1">
+
         <!--Socios-->
-        <div class="flex flex-col gap-y-2 py-2 px-4">
-            <p class="text-slate-500 font-semibold text-center">Socios</p>
+        <div class="flex flex-col gap-y-1">
+            <p class="text-slate-500 font-semibold text-center ">Socio/s</p>         
             ${ 
-               resultado.map( socio => {
-                return createSocioHTML(socio)
-               }).join('')
-            
-            }
-            
-        </div>            
-    </div>  
-    <!--Fin de la tarjeta -->               
+                resultado.map( socio => {
+                 return createSocioHTML(socio)
+                }).join('')
+             
+             }
+        </div> 
     `
 
-    card_lote.addEventListener('click',()=> getTerrenos(lote.id_lote));
+    card_lote.addEventListener('click',()=> getTerrenos(loteo.id_lote));
 
-    return card_lote;
-            
+    return card_lote;        
      
 
     
@@ -213,16 +288,22 @@ function createCardLote(lote, porcentajes, socios){
 
 function createSocioHTML(socio){
 
+    //console.log(socio)
+
+    if(!socio.hasOwnProperty('nombre'))
+        return ``
+    
+       
     return `
         <div class="flex items-center border rounded p-1 justify-between">
-            <i class="flex items-center mr-1 text-red-600"><span class="material-icons-round">person</span></i>
+            <i class="flex items-center mr-1 text-black"><span class="material-icons-round">person</span></i>
             <!-- Mostraría la información del socio-->
             <a class="text-sm"> ${socio.nombre} ${socio.apellido} </a>
             <p class="ml-4">${socio.porcentaje} %</p>  
         </div>
     `
-
 }
+
 
 
 
